@@ -1,0 +1,20 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: false
+      dhcp6: true
+  bridges:
+    br0:
+      interfaces: [eth0]
+      dhcp4: false
+      dhcp6: true
+      addresses: [192.168.1.123/24]
+      gateway4: 192.168.1.1
+      nameservers:
+        addresses: [192.168.1.1]
+      parameters:
+        forward-delay: 0
+        stp: false
+      optional: true

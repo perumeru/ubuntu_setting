@@ -1,23 +1,24 @@
-#init
+#init aptのインストール
 sudo apt install
 sudo apt update
 sudo apt upgrade
 sudo apt dist-upgrade
 sudo apt autoremove
 
+#ユーザー名変更のためのユーザー追加
 sudo useradd -M tmp
 sudo gpasswd -a tmp sudo
 sudo passwd tmp
 sudo reboot
 
-#tmp login
+#tmp login　tmpでログインしてメインのユーザー名変更
 #kill -STOP (num) or kill -3 (num)
 sudo usermod -l ubtusr13579 ubuntu
 sudo usermod -d /home/ubtusr13579 -m ubtusr13579
 sudo groupmod -n ubtusr13579 ubuntu
 sudo reboot
 
-#ubtusr13579 login
+#ubtusr13579 login ubtusr13579でログイン
 sudo userdel tmp
 sudo passwd ubtusr13579
 sudo apt-get install unattended-upgrades
@@ -36,79 +37,82 @@ cd /etc/netplan/
 sudo apt install -y bridge-utils
 sudo brctl show
 
-sudo apt -y install apache2
-sudo apt -y install perl
-sudo a2enmod cgid
-sudo systemctl restart apache2
-
+#sudo netplan applyの前に99_config.yamlを確認。ipが変わる。
 sudo wget https://perumeru.github.io/hosts/99_config.yaml
 sudo netplan apply
 sudo apt install build-essential
+##sshの設定をする
 cd /etc/ssh
 sudo cp -f sshd_config sshd_config_bk
 sudo rm -f sshd_config
-
 sudo wget https://perumeru.github.io/hosts/sshd_config
 
 {
-##init
+##ここから自由
+##init　初期設定
 ##https://qiita.com/kotarella1110/items/f638822d64a43824dfa4
 
-##SSH Port change
+##SSH Port change　SSHのポート変更
 ##sudo nano sshd_config
 ##Port 20 → 2222 ...
-##SSH ssh-keygen
+##SSH ssh-keygen パスワードを使用できないようにする
 ##https://www.server-world.info/query?os=Ubuntu_20.04&p=ssh&f=4
 
-##Apache2
+##Apache2 http通信
 ##https://www.server-world.info/query?os=Ubuntu_20.04&p=httpd&f=1
 
-##php
+#apacheでcgidを使う設定
+#sudo apt -y install apache2
+#sudo apt -y install perl
+#sudo a2enmod cgid
+#sudo systemctl restart apache2
+
+##php php設定
 ##https://www.server-world.info/query?os=Ubuntu_20.04&p=httpd&f=6
 ##http://regpon.hatenablog.com/entry/2018/02/02/174219
 ##https://qiita.com/knife0125/items/0e1af52255e9879f9332
 
-##mod_security
+##mod_security apache設定
 ##https://quso.tech/setup-modsecurity-for-apache-on-ubuntu-18-04/
 
-##Apache2ssl
+##Apache2ssl ssl通信
 ##https://www.server-world.info/query?os=Ubuntu_20.04&p=httpd&f=3
 
-##mod_md
+##mod_md 
 ##https://www.server-world.info/query?os=Ubuntu_20.04&p=httpd&f=12
 
 ##security
 ##https://qiita.com/bezeklik/items/1c4145652661cf5b2271
 
-##HAProxy 
+##HAProxy 分散処理 
 ##https://www.server-world.info/query?os=Ubuntu_18.04&p=haproxy&f=1
 
-##Postfix
+##Postfix メール設定
 ##https://www.server-world.info/query?os=Ubuntu_20.04&p=mail&f=1
 
-##Dovecot
+##Dovecot メール設定2
 ##https://www.server-world.info/query?os=Ubuntu_20.04&p=mail&f=2
 
-##Tripwire 
+##Tripwire 改ざん検知
 ##https://www.server-world.info/query?os=Ubuntu_18.04&p=tripwire
-##AIDE 
+##AIDE 改ざん検知
 ##https://www.server-world.info/query?os=Ubuntu_18.04&p=aide
-##Clam AntiVirus
+##Clam AntiVirus ウイルス対策
 ##https://www.server-world.info/query?os=Ubuntu_18.04&p=clamav
 
-##mail realtime scan
+##mail realtime scan メールウイルス対策
 ##https://www.server-world.info/query?os=Ubuntu_20.04&p=mail&f=7
 
-##connect JP only
+##connect JP only 外部からの接続を日本限定に設定
 ##https://perumeru.github.io/hosts/allowjp.sh
 
-##inotifywait
+##inotifywait リアルタイム改ざん検知
 ##sudo apt-get install inotify-tools
 ##sudo bash -c "sudo inotifywait -m -e create,delete,modify,move,attrib --format '%T %w %f %e' -r --timefmt '%F %T' /etc" >> inotify.sh
 ##sudo sh inotify.sh
 ##sudo touch /etc/ts
 ##sudo rm -f /etc/ts
 
-##sdd,ssd
+##sdd,ssd 外部メモリの設定
 ##https://qiita.com/pollenjp/items/d5924016a6c88e4a9172
 }

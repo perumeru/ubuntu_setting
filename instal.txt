@@ -1,0 +1,114 @@
+#init
+sudo apt install
+sudo apt update
+sudo apt upgrade
+sudo apt dist-upgrade
+sudo apt autoremove
+
+sudo useradd -M tmp
+sudo gpasswd -a tmp sudo
+sudo passwd tmp
+sudo reboot
+
+#tmp login
+#kill -STOP (num) or kill -3 (num)
+sudo usermod -l ubtusr13579 ubuntu
+sudo usermod -d /home/ubtusr13579 -m ubtusr13579
+sudo groupmod -n ubtusr13579 ubuntu
+sudo reboot
+
+#ubtusr13579 login
+sudo userdel tmp
+sudo passwd ubtusr13579
+sudo apt-get install unattended-upgrades
+sudo dpkg-reconfigure -plow unattended-upgrades
+sudo hostnamectl set-hostname ubtusr2468
+sudo apt install ubuntu-defaults-ja
+sudo apt install ufw
+sudo ufw allow from 10.0.0.0/8 to any port 22 proto tcp
+sudo ufw allow from 172.16.0.0/12 to any port 22 proto tcp
+sudo ufw allow from 192.168.0.0/16 to any port 22 proto tcp
+sudo ufw enable
+sudo ufw logging on
+sudo systemctl start ufw
+sudo rm -f /etc/sudoers.d/010_pi-nopasswd
+cd /etc/netplan/
+sudo apt install -y bridge-utils
+sudo brctl show
+
+sudo apt -y install apache2
+sudo apt -y install perl
+sudo a2enmod cgid
+sudo systemctl restart apache2
+
+sudo wget https://perumeru.github.io/hosts/99_config.yaml
+sudo netplan apply
+sudo apt install build-essential
+cd /etc/ssh
+sudo cp -f sshd_config sshd_config_bk
+sudo rm -f sshd_config
+
+sudo wget https://perumeru.github.io/hosts/sshd_config
+
+{
+##init
+##https://qiita.com/kotarella1110/items/f638822d64a43824dfa4
+
+##SSH Port change
+##sudo nano sshd_config
+##Port 20 → 2222 ...
+##SSH ssh-keygen
+##https://www.server-world.info/query?os=Ubuntu_20.04&p=ssh&f=4
+
+##Apache2
+##https://www.server-world.info/query?os=Ubuntu_20.04&p=httpd&f=1
+
+##php
+##https://www.server-world.info/query?os=Ubuntu_20.04&p=httpd&f=6
+##http://regpon.hatenablog.com/entry/2018/02/02/174219
+##https://qiita.com/knife0125/items/0e1af52255e9879f9332
+
+##mod_security
+##https://quso.tech/setup-modsecurity-for-apache-on-ubuntu-18-04/
+
+##Apache2ssl
+##https://www.server-world.info/query?os=Ubuntu_20.04&p=httpd&f=3
+
+##mod_md
+##https://www.server-world.info/query?os=Ubuntu_20.04&p=httpd&f=12
+
+##security
+##https://qiita.com/bezeklik/items/1c4145652661cf5b2271
+
+##HAProxy 
+##https://www.server-world.info/query?os=Ubuntu_18.04&p=haproxy&f=1
+
+##Postfix
+##https://www.server-world.info/query?os=Ubuntu_20.04&p=mail&f=1
+
+##Dovecot
+##https://www.server-world.info/query?os=Ubuntu_20.04&p=mail&f=2
+
+##Tripwire 
+##https://www.server-world.info/query?os=Ubuntu_18.04&p=tripwire
+##AIDE 
+##https://www.server-world.info/query?os=Ubuntu_18.04&p=aide
+##Clam AntiVirus
+##https://www.server-world.info/query?os=Ubuntu_18.04&p=clamav
+
+##mail realtime scan
+##https://www.server-world.info/query?os=Ubuntu_20.04&p=mail&f=7
+
+##connect JP only
+##https://perumeru.github.io/hosts/allowjp.sh
+
+##inotifywait
+##sudo apt-get install inotify-tools
+##sudo bash -c "sudo inotifywait -m -e create,delete,modify,move,attrib --format '%T %w %f %e' -r --timefmt '%F %T' /etc" >> inotify.sh
+##sudo sh inotify.sh
+##sudo touch /etc/ts
+##sudo rm -f /etc/ts
+
+##sdd,ssd
+##https://qiita.com/pollenjp/items/d5924016a6c88e4a9172
+}

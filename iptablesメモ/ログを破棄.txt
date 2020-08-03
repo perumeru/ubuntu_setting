@@ -1,0 +1,95 @@
+# ブロードキャストパケットをログを記録せずに破棄
+iptables -N FW_BROADCAST 2>/dev/null
+iptables -N DENY_BROADCAST
+iptables -A FW_BROADCAST -i e+ -j DENY_BROADCAST
+iptables -A FW_BROADCAST -i p+ -j DENY_BROADCAST
+iptables -A FW_BROADCAST -i w+ -j DENY_BROADCAST
+iptables -A DENY_BROADCAST -m pkttype --pkt-type broadcast -j DROP
+
+# マルチキャストパケットをログを記録せずに破棄
+iptables -N FW_MULTICAST 2>/dev/null
+iptables -N DENY_MULTICAST
+iptables -A FW_MULTICAST -i e+ -j DENY_MULTICAST
+iptables -A FW_MULTICAST -i p+ -j DENY_MULTICAST
+iptables -A FW_MULTICAST -i w+ -j DENY_MULTICAST
+iptables -A DENY_MULTICAST -m pkttype --pkt-type multicast -j DROP
+
+# フラグメント化されたパケットをログを記録して破棄してNG
+iptables -N FW_FRAGMENT 2>/dev/null
+iptables -N DENY_FRAGMENT
+iptables -N DENY_FRAGMENT_
+iptables -A FW_FRAGMENT -i e+ -j DENY_FRAGMENT
+iptables -A FW_FRAGMENT -i p+ -j DENY_FRAGMENT
+iptables -A FW_FRAGMENT -i w+ -j DENY_FRAGMENT
+iptables -A DENY_FRAGMENT -f -j DENY_FRAGMENT_
+iptables -A DENY_FRAGMENT_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES FRAGMENT] : '
+iptables -A DENY_FRAGMENT_ -j TRACK_ATTACKER
+iptables -A DENY_FRAGMENT_ -j DROP
+iptables -A FIREWALL -j FW_FRAGMENT && echo "FIREWALL	DENY_FRAGMENT"
+
+# 不正なパケットをログを記録して破棄してNG
+iptables -N FW_INVALID 2>/dev/null
+iptables -N DENY_INVALID
+iptables -N DENY_INVALID_
+iptables -A FW_INVALID -i e+ -j DENY_INVALID
+iptables -A FW_INVALID -i p+ -j DENY_INVALID
+iptables -A FW_INVALID -i w+ -j DENY_INVALID
+iptables -A DENY_INVALID -m state --state INVALID -j DENY_INVALID_
+iptables -A DENY_INVALID_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES INVALID] : '
+iptables -A DENY_INVALID_ -j DROP
+iptables -A FIREWALL -j FW_INVALID && echo "FIREWALL	DENY_INVALID"
+
+# 外部とのNetBIOS関連のアクセスはログを記録せずに破棄してNG
+iptables -N FW_NETBIOS 2>/dev/null
+iptables -N DENY_NETBIOS
+iptables -N DENY_NETBIOS_
+iptables -A FW_NETBIOS -i e+ -j DENY_NETBIOS
+iptables -A FW_NETBIOS -i p+ -j DENY_NETBIOS
+iptables -A FW_NETBIOS -i w+ -j DENY_NETBIOS
+iptables -A DENY_NETBIOS -p tcp -m multiport --dports 135,137,138,139,445 -j DENY_NETBIOS_
+iptables -A DENY_NETBIOS -p udp -m multiport --dports 135,137,138,139,445 -j DENY_NETBIOS_
+iptables -A DENY_NETBIOS_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES NETBIOS] : '
+iptables -A DENY_NETBIOS_ -j TRACK_ATTACKER
+iptables -A DENY_NETBIOS_ -j DROP
+iptables -A FIREWALL -j FW_NETBIOS && echo "FIREWALL	DENY_NETBIOS"
+iptables -A FW_BASIC -j FW_NETBIOS
+
+# UDPによる過大なアクセスをログを記録して破棄
+iptables -N FW_UDPFLOOD 2>/dev/null
+iptables -N ANTI_UDPFLOOD
+iptables -N ANTI_UDPFLOOD_
+iptables -A FW_UDPFLOOD -j ANTI_UDPFLOOD
+iptables -A ANTI_UDPFLOOD -i e+ -p udp -m state --state NEW -j ANTI_UDPFLOOD_
+iptables -A ANTI_UDPFLOOD -i p+ -p udp -m state --state NEW -j ANTI_UDPFLOOD_
+iptables -A ANTI_UDPFLOOD -i w+ -p udp -m state --state NEW -j ANTI_UDPFLOOD_
+iptables -A ANTI_UDPFLOOD_ \
+          -m hashlimit \
+          --hashlimit-name udp \
+          --hashlimit 30/m \
+          --hashlimit-burst 60 \
+          --hashlimit-mode srcip \
+          --hashlimit-htable-expire 60000 \
+          -j RETURN
+iptables -A ANTI_UDPFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES UDPFLOOD] : '
+iptables -A ANTI_UDPFLOOD_ -j DROP
+iptables -A FIREWALL -j FW_UDPFLOOD && echo "FIREWALL	ANTI_UDPFLOOD"
+#
+# ICMPによる過大なアクセスをログを記録して破棄
+iptables -N FW_ICMPFLOOD 2>/dev/null
+iptables -N ANTI_ICMPFLOOD
+iptables -N ANTI_ICMPFLOOD_
+iptables -A FW_ICMPFLOOD -j ANTI_ICMPFLOOD
+iptables -A ANTI_ICMPFLOOD -i e+ -p icmp -j ANTI_ICMPFLOOD_
+iptables -A ANTI_ICMPFLOOD -i p+ -p icmp -j ANTI_ICMPFLOOD_
+iptables -A ANTI_ICMPFLOOD -i w+ -p icmp -j ANTI_ICMPFLOOD_
+iptables -A ANTI_ICMPFLOOD_ \
+          -m hashlimit \
+          --hashlimit-name icmp \
+          --hashlimit 30/m \
+          --hashlimit-burst 60 \
+          --hashlimit-mode srcip \
+          --hashlimit-htable-expire 60000 \
+          -j RETURN
+iptables -A ANTI_ICMPFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES ICMPFLOOD] : '
+iptables -A ANTI_ICMPFLOOD_ -j DROP
+iptables -A FIREWALL -j FW_ICMPFLOOD && echo "FIREWALL	ANTI_ICMPFLOOD"

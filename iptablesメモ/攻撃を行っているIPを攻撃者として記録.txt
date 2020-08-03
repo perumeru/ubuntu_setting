@@ -1,0 +1,29 @@
+iptables -N TRACK_ATTACKER 2>/dev/null
+iptables -N ANTI_ATTACKER
+iptables -N ANTI_ATTACKER_
+iptables -A TRACK_ATTACKER -j ANTI_ATTACKER
+iptables -A ANTI_ATTACKER -i e+ -j ANTI_ATTACKER_
+iptables -A ANTI_ATTACKER -i p+ -j ANTI_ATTACKER_
+iptables -A ANTI_ATTACKER -i w+ -j ANTI_ATTACKER_
+iptables -A ANTI_ATTACKER_ -m recent --name attacker-rapid --update --rttl --seconds 10 -j RETURN
+iptables -A ANTI_ATTACKER_ -m recent --name attacker-rapid --set
+iptables -A ANTI_ATTACKER_ \
+          -m hashlimit \
+          --hashlimit-name attacker-rapid \
+          --hashlimit-above 6/m \
+          --hashlimit-mode srcip \
+          --hashlimit-htable-expire 10000 \
+          -j RETURN
+iptables -A ANTI_ATTACKER_ -m recent --name attacker-fast --update --rttl --seconds 60 -j RETURN
+iptables -A ANTI_ATTACKER_ -m recent --name attacker-fast --set
+iptables -A ANTI_ATTACKER_ \
+          -m hashlimit \
+          --hashlimit-name attacker-fast \
+          --hashlimit-above 1/m \
+          --hashlimit-mode srcip \
+          --hashlimit-htable-expire 60000 \
+          -j RETURN
+iptables -A ANTI_ATTACKER_ -m recent --name attacker-medium --update --rttl --seconds 3600 -j RETURN
+iptables -A ANTI_ATTACKER_ -m recent --name attacker-medium --set
+#iptables -A ANTI_ATTACKER_ -m recent --name attacker-slow --update --rttl --seconds 86400 -j RETURN
+iptables -A ANTI_ATTACKER_ -m recent --name attacker-slow --set

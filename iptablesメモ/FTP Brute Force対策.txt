@@ -1,0 +1,8 @@
+# FTPはパスワード認証のため、パスワード総当り攻撃に備える。
+# 1分間に5回しか接続トライをできないようにする。
+# FTPクライアント側が再接続を繰り返すのを防ぐためDROPではなくREJECTにする。
+# FTPサーバを立ち上げている場合、以下をアンコメントアウトする
+###########################################################
+iptables -A INPUT -p tcp --syn -m multiport --dports $FTP -m recent --name ftp_attack --set
+iptables -A INPUT -p tcp --syn -m multiport --dports $FTP -m recent --name ftp_attack --rcheck --seconds 60 --hitcount 5 -j LOG --log-prefix "ftp_brute_force: "
+iptables -A INPUT -p tcp --syn -m multiport --dports $FTP -m recent --name ftp_attack --rcheck --seconds 60 --hitcount 5 -j REJECT --reject-with tcp-reset

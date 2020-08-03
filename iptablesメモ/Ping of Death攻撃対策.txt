@@ -1,0 +1,19 @@
+iptables -N FW_PINGDEATH 2>/dev/null
+iptables -N ANTI_PINGDEATH
+iptables -N ANTI_PINGDEATH_
+iptables -A FW_PINGDEATH -i e+ -p icmp --icmp-type echo-request -j ANTI_PINGDEATH
+iptables -A FW_PINGDEATH -i p+ -p icmp --icmp-type echo-request -j ANTI_PINGDEATH
+iptables -A FW_PINGDEATH -i w+ -p icmp --icmp-type echo-request -j ANTI_PINGDEATH
+iptables -A ANTI_PINGDEATH -j ANTI_PINGDEATH_
+iptables -A ANTI_PINGDEATH_ \
+          -m hashlimit \
+          --hashlimit-name ping \
+          --hashlimit 1/s \
+          --hashlimit-burst 4 \
+          --hashlimit-mode srcip \
+          --hashlimit-htable-expire 1000 \
+          -j RETURN
+iptables -A ANTI_PINGDEATH_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES PINGDEATH] : '
+iptables -A ANTI_PINGDEATH_ -j TRACK_ATTACKER
+iptables -A ANTI_PINGDEATH_ -j DROP
+iptables -A FIREWALL -j FW_PINGDEATH && echo "FIREWALL	ANTI_PINGDEATH"

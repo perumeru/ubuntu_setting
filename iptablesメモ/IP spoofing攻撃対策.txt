@@ -1,0 +1,17 @@
+iptables -N FW_SPOOFING 2>/dev/null
+iptables -N ANTI_SPOOFING
+iptables -N ANTI_SPOOFING_
+iptables -N ANTI_SPOOFING__
+iptables -A FW_SPOOFING -j ANTI_SPOOFING
+iptables -A ANTI_SPOOFING -i e+ -j ANTI_SPOOFING_
+iptables -A ANTI_SPOOFING -i p+ -j ANTI_SPOOFING_
+iptables -A ANTI_SPOOFING -i w+ -j ANTI_SPOOFING_
+iptables -A ANTI_SPOOFING_ -s 127.0.0.0/8    -j ANTI_SPOOFING__
+iptables -A ANTI_SPOOFING_ -s 10.0.0.0/8     -j ANTI_SPOOFING__
+iptables -A ANTI_SPOOFING_ -s 172.16.0.0/12  -j ANTI_SPOOFING__
+iptables -A ANTI_SPOOFING_ -s 192.168.0.0/16 -j ANTI_SPOOFING__
+iptables -A ANTI_SPOOFING__ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES SPOOFING] : '
+iptables -A ANTI_SPOOFING__ -j TRACK_ATTACKER
+iptables -A ANTI_SPOOFING__ -j DROP
+iptables -A FIREWALL -j FW_SPOOFING && echo "FIREWALL	ANTI_SPOOFING"
+iptables -A FW_BASIC -j FW_SPOOFING

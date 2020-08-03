@@ -1,0 +1,8 @@
+# SSHはパスワード認証を利用しているサーバの場合、パスワード総当り攻撃に備える。
+# 1分間に5回しか接続トライをできないようにする。
+# SSHクライアント側が再接続を繰り返すのを防ぐためDROPではなくREJECTにする。
+# SSHサーバがパスワード認証ONの場合、以下をアンコメントアウトする
+###########################################################
+iptables -A INPUT -p tcp --syn -m multiport --dports $SSH -m recent --name ssh_attack --set
+iptables -A INPUT -p tcp --syn -m multiport --dports $SSH -m recent --name ssh_attack --rcheck --seconds 60 --hitcount 5 -j LOG --log-prefix "ssh_brute_force: "
+iptables -A INPUT -p tcp --syn -m multiport --dports $SSH -m recent --name ssh_attack --rcheck --seconds 60 --hitcount 5 -j REJECT --reject-with tcp-reset

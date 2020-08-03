@@ -1,0 +1,6 @@
+sed -i '/net.ipv4.conf.*.accept_redirects/d' /etc/sysctl.conf
+for dev in `ls /proc/sys/net/ipv4/conf/`
+do
+    sysctl -w net.ipv4.conf.$dev.accept_redirects=0 > /dev/null
+    echo "net.ipv4.conf.$dev.accept_redirects=0" >> /etc/sysctl.conf
+done

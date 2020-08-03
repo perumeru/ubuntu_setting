@@ -1,0 +1,47 @@
+# -m hashlimit                 ：hashlimitモジュールを利用
+# --hashlimit-name name        ：ハッシュテーブル名
+# --hashlimit n                ：パケット回復量
+# --hashlimit-burst n          ：パケット容量
+# --hashlimit-mode hash        ：同一アクセスとしてカウントする識別基準
+# --hashlimit-htable-expire ms ：ハッシュテーブル内のレコードの有効期間(単位：ミリ秒)
+#
+# HTTPポートへの過大なアクセスをログを記録して破棄
+iptables -N FW_SYNFLOOD 2>/dev/null
+iptables -N ANTI_SYNFLOOD
+iptables -N ANTI_SYNFLOOD_
+iptables -A FW_SYNFLOOD -p tcp --dport 80 -j ANTI_SYNFLOOD
+iptables -A ANTI_SYNFLOOD -i e+ -p tcp -m state --state NEW -j ANTI_SYNFLOOD_
+iptables -A ANTI_SYNFLOOD -i p+ -p tcp -m state --state NEW -j ANTI_SYNFLOOD_
+iptables -A ANTI_SYNFLOOD -i w+ -p tcp -m state --state NEW -j ANTI_SYNFLOOD_
+iptables -A ANTI_SYNFLOOD_ \
+          -m hashlimit \
+          --hashlimit-name http \
+          --hashlimit 10/m \
+          --hashlimit-burst 60 \
+          --hashlimit-mode srcip \
+          --hashlimit-htable-expire 60000 \
+          -j RETURN
+iptables -A ANTI_SYNFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES SYNFLOOD] : '
+iptables -A ANTI_SYNFLOOD_ -j DROP
+iptables -A FIREWALL -j FW_SYNFLOOD && echo "FIREWALL	ANTI_SYNFLOOD"
+#
+# HTTPSポートへの過大なアクセスをログを記録して破棄
+iptables -N FW_SYNFLOOD_SSL 2>/dev/null
+iptables -N ANTI_SYNFLOOD_SSL
+iptables -N ANTI_SYNFLOOD_SSL_
+iptables -A FW_SYNFLOOD_SSL -p tcp --dport 443 -j ANTI_SYNFLOOD_SSL
+iptables -A ANTI_SYNFLOOD_SSL -i e+ -p tcp -m state --state NEW -j ANTI_SYNFLOOD_SSL_
+iptables -A ANTI_SYNFLOOD_SSL -i p+ -p tcp -m state --state NEW -j ANTI_SYNFLOOD_SSL_
+iptables -A ANTI_SYNFLOOD_SSL -i w+ -p tcp -m state --state NEW -j ANTI_SYNFLOOD_SSL_
+iptables -A ANTI_SYNFLOOD_SSL_ \
+          -m hashlimit \
+          --hashlimit-name https \
+          --hashlimit 30/m \
+          --hashlimit-burst 60 \
+          --hashlimit-mode srcip \
+          --hashlimit-htable-expire 60000 \
+          -j RETURN
+iptables -A ANTI_SYNFLOOD_SSL_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix '[IPTABLES SYNFLOOD(SSL)] : '
+iptables -A ANTI_SYNFLOOD_SSL_ -j DROP
+iptables -A FIREWALL -j FW_SYNFLOOD_SSL && echo "FIREWALL	ANTI_SYNFLOOD_SSL"
+#

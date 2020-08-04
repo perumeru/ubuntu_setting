@@ -1,2 +1,2 @@
-iptables -A INPUT -f -j LOG --log-prefix 'fragment_packet:'
+iptables -A INPUT -f -j LOG --log-prefix 'fragment_packet:' #fragment packetとして受信したパケットをヘッダfragment_packet:でログに記録後破棄。
 iptables -A INPUT -f -j DROP

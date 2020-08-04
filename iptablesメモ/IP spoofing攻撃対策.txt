@@ -1,4 +1,5 @@
 #IP spoofing攻撃 :送信元のIPアドレスを偽装し、通信を行う攻撃手法
+#ローカルIPになりすまして、外部からの侵入を試みる対策
 iptables -N FW_SPOOFING 2>/dev/null
 iptables -N ANTI_SPOOFING
 iptables -N ANTI_SPOOFING_

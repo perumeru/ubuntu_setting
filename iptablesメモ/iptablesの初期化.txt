@@ -152,3 +152,10 @@ Flushing firewall rules: [ OK ]
 Setting chains to policy ACCEPT: mangle filter nat [ OK ]
 Unloading iptables modules: [ OK ]
 Applying iptables firewall rules: [ OK ]
+
+すべての着信HTTPおよびHTTPSを許可する
+HTTPトラフィックとHTTPSトラフィックの両方を許可する場合は、* multiport *モジュールを使用して、両方のポートを許可するルールを作成できます。 すべての着信HTTPおよびHTTPS（ポート443）接続を許可するには、次のコマンドを実行します。
+
+sudo iptables -A INPUT -p tcp -m multiport --dports 80,443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+sudo iptables -A OUTPUT -p tcp -m multiport --dports 80,443 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+確立された HTTPおよびHTTPS接続の発信トラフィックを許可する2番目のコマンドは、 `+ OUTPUT `ポリシーが ` ACCEPT +`に設定されていない場合にのみ必要です。

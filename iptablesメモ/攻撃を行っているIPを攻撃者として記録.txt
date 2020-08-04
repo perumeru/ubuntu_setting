@@ -1,3 +1,4 @@
+#攻撃間隔別でログを残す。
 iptables -N TRACK_ATTACKER 2>/dev/null
 iptables -N ANTI_ATTACKER
 iptables -N ANTI_ATTACKER_

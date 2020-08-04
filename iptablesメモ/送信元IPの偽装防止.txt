@@ -1,3 +1,4 @@
+#IPスプーフィング対策
 sed -i '/net.ipv4.conf.*.rp_filter/d' /etc/sysctl.conf
 for dev in `ls /proc/sys/net/ipv4/conf/`
 do

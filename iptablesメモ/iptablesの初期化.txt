@@ -98,4 +98,57 @@ iptables -t mangle -A PREROUTING -p tcp --dport 443 -j MARK --set-mark 80
 iptables -t mangle -A PREROUTING -m mark --mark 80 -j DROP
 
 
+1) パケットフィルタリングルールをクリア
+# iptables -F
+2) パケットフィルタリングルールを追加
+ループバックアドレスからのアクセスを許可
+# iptables -A INPUT -i lo -j ACCEPT
+# iptables -A OUTPUT -o lo -j ACCEPT
+不特定ホストから自ホストへのPINGを許可
+# iptables -A INPUT -p icmp --icmp-type echo-request -d $localhostIP -j ACCEPT
+# iptables -A OUTPUT -p icmp --icmp-type echo-reply -s $localhostIP -j ACCEPT
+自ホストから不特定ホストへのPINGを許可
+# iptables -A OUTPUT -p icmp --icmp-type echo-request -s $localhostIP -j ACCEPT
+# iptables -A INPUT -p icmp --icmp-type echo-reply -d $localhostIP -j ACCEPT
+特定IPから自ホストへのSSHを許可
+# iptables -A INPUT -p tcp -s $TrustIP -d $localhostIP --dport 22 -j ACCEPT
+# iptables -A OUTPUT -p tcp -s $localhostIP --sport 22 -d $TrustIP -j ACCEPT
+任意のネットワークからのHTTPへのアクセスを許可
+# iptables -A INPUT -p tcp -s 0.0.0.0/0 -d $localhostIP --dport 80 -j ACCEPT
+# iptables -A OUTPUT -p tcp -s $localhostIP --sport 80 -d 0.0.0.0/0 -j ACCEPT
+任意のネットワークからのFTP接続を許可
+# iptables -A INPUT -p tcp -d $localhostIP --dport 21 -j ACCEPT
+# iptables -A OUTPUT -p tcp -s $localhostIP --sport 21 -j ACCEPT
 
+# iptables -A INPUT -p tcp -d $localhostIP --dport 20 -j ACCEPT
+# iptables -A OUTPUT -p tcp -s $localhostIP --sport 20 -j ACCEPT
+任意のネットワークからのSMTP接続を許可
+# iptables -A INPUT -p tcp -d $localhostIP --dport 25 -j ACCEPT
+# iptables -A OUTPUT -p tcp -s $localhostIP --sport 25 -j ACCEPT
+任意のネットワークからのメール受信(POP)を許可
+# iptables -A INPUT -p tcp -s $TrustIP -d $localhostIP --dport 110 -j ACCEPT
+# iptables -A OUTPUT -p tcp -s $localhostIP -d $TrustIP --sport 110 -j ACCEPT
+DNSの利用を許可
+# iptables -A INPUT -p udp --sport 53 -j ACCEPT
+# iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+
+# iptables -A INPUT -p tcp --sport 53 -j ACCEPT
+# iptables -A OUTPUT -p tcp --dport 53 -j ACCEPT
+ログ取得設定
+# iptables -N LOGGING
+# iptables -A LOGGING -j LOG --log-level warning --log-prefix "DROP:" -m limit
+# iptables -A LOGGING -j DROP
+# iptables -A INPUT -j LOGGING
+3) ポリシーを設定 -> その他全ての接続を拒否
+# iptables -P INPUT DROP
+# iptables -P OUTPUT DROP
+# iptables -P FORWARD DROP
+4) iptablesの保存と再起動
+# /etc/init.d/iptables save
+Saving firewall rules to /etc/sysconfig/iptables: [ OK ]
+
+# /etc/init.d/iptables restart
+Flushing firewall rules: [ OK ]
+Setting chains to policy ACCEPT: mangle filter nat [ OK ]
+Unloading iptables modules: [ OK ]
+Applying iptables firewall rules: [ OK ]

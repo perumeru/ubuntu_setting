@@ -25,7 +25,20 @@ sudo passwd ubtusr13579
 sudo apt-get install unattended-upgrades
 sudo dpkg-reconfigure -plow unattended-upgrades
 sudo hostnamectl set-hostname ubtusr2468
-sudo apt install ubuntu-defaults-ja
+sudo apt-get install language-pack-ja
+sudo update-locale LANG=ja_JP.UTF-8
+sudo ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+sudo dpkg-reconfigure --frontend noninteractive tzdata
+sudo apt-get install fonts-ipafont
+sudo apt-get install ntp
+sudo service ntp stop
+sudo ntpdate ntp.nict.jp
+sudo nano /etc/ntp.conf
+sudo service ntp start
+sudo apt-get install sysv-rc-conf
+
+
+
 sudo apt install ufw
 sudo ufw allow from 10.0.0.0/8 to any port 22 proto tcp
 sudo ufw allow from 172.16.0.0/12 to any port 22 proto tcp

@@ -9,7 +9,7 @@ sudo apt autoremove
 sudo useradd -M tmp
 sudo gpasswd -a tmp sudo
 sudo passwd tmp
-sudo logout
+logout
 
 #tmp login　tmpでログインしてメインのユーザー名変更
 #kill -STOP (num) or kill -3 (num)

@@ -2055,7 +2055,7 @@ initialize()
 	iptables -P INPUT   ACCEPT
 	iptables -P OUTPUT  ACCEPT
 	iptables -P FORWARD ACCEPT
-	if [ -z "$STRING" ]; then
+	if [ -z "$SSH" ]; then
 	 $SSH=22 #処理
 	fi
 }

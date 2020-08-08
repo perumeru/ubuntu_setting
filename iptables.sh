@@ -2351,7 +2351,7 @@ if [ "${ALLOW_SSH_HOSTS}" ]
 then
 	for allow_sshhost in ${ALLOW_SSH_HOSTS[@]}
 	do
-		iptables -A INPUT -p tcp -s $allow_sshhost -m multiport --dports $SSH -j ACCEPT # LIMITED_LOCAL_NET -> SELF
+		iptables -A INPUT -p tcp -s $allow_sshhost -m multiport --dports $SSH -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT # LIMITED_LOCAL_NET -> SELF
 	done
 fi
 ###########################################################

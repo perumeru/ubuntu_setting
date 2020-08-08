@@ -2,6 +2,8 @@
 
 #start#   sudo bash iptables.sh
 #end#     sudo iptables-save -c
+#end(ubuntuonly)#     sudo apt-get install iptables-persistent
+#end(ubuntuonly)#     sudo iptables-restore < /etc/iptables/rules.v4
 
 # パス
 PATH=/sbin:/usr/sbin:/bin:/usr/bin

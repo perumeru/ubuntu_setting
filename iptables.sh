@@ -2087,12 +2087,12 @@ finailize()
 	return 1
 }
 ###########################################################
-# initialize
+echo "initialize"
 ###########################################################
 initialize
 PolicyDecision
 ###########################################################
-# 信頼ホスト許可
+echo "ALLOW_LOCAL_HOSTS"
 ###########################################################
 iptables -A INPUT -i lo -j ACCEPT # SELF -> SELF
 #PRIVATE IP許可
@@ -2104,49 +2104,49 @@ then
 	done
 fi
 ###########################################################
-# セッション確立後のパケット疎通は許可
+echo "Allow packet communication after session is established"
 ###########################################################
 iptables -A INPUT  -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
 ###########################################################
-#対策 start
+echo "Measures start"
 ###########################################################
-# 送信元IPの偽装防止
+echo "Source IP spoofing prevention"
 sed -i '/net.ipv4.conf.*.rp_filter/d' /etc/sysctl.conf
 for dev in `ls /proc/sys/net/ipv4/conf/`
 do
     sysctl -w net.ipv4.conf.$dev.rp_filter=1 > /dev/null
     echo "net.ipv4.conf.$dev.rp_filter=1" >> /etc/sysctl.conf
 done
-# ICMP Redirectパケットを拒否
+echo "Reject ICMP Redirect packets"
 sed -i '/net.ipv4.conf.*.accept_redirects/d' /etc/sysctl.conf
 for dev in `ls /proc/sys/net/ipv4/conf/`
 do
     sysctl -w net.ipv4.conf.$dev.accept_redirects=0 > /dev/null
     echo "net.ipv4.conf.$dev.accept_redirects=0" >> /etc/sysctl.conf
 done
-# Source Routedパケットを拒否
+echo "Deny Source Routed packet"
 sed -i '/net.ipv4.conf.*.accept_source_route/d' /etc/sysctl.conf
 for dev in `ls /proc/sys/net/ipv4/conf/`
 do
     sysctl -w net.ipv4.conf.$dev.accept_source_route=0 > /dev/null
     echo "net.ipv4.conf.$dev.accept_source_route=0" >> /etc/sysctl.conf
 done
-# ブロードキャストアドレス宛pingには応答しない
-# ※Smurf攻撃対策
+echo "Smurf attack countermeasures"
 sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=1 > /dev/null
 sed -i '/net.ipv4.icmp_echo_ignore_broadcasts/d' /etc/sysctl.conf
 echo "net.ipv4.icmp_echo_ignore_broadcasts=1" >> /etc/sysctl.conf
 # SYN Cookiesを有効にする
-# ※TCP SYN Flood攻撃対策
+echo "TCP SYN Flood attack countermeasures"
 sysctl -w net.ipv4.tcp_syncookies=1 > /dev/null
 sed -i '/net.ipv4.tcp_syncookies/d' /etc/sysctl.conf
 echo "net.ipv4.tcp_syncookies=1" >> /etc/sysctl.conf
 # システムの連続稼働時間を通知しない
-# ※カーネルバージョン特定対策
+echo "Kernel version specific measures"
 sysctl -w net.ipv4.tcp_timestamps=1 > /dev/null
 sed -i '/net.ipv4.tcp_timestamps/d' /etc/sysctl.conf
 echo "net.ipv4.tcp_timestamps=1" >> /etc/sysctl.conf
 # 攻撃を行っているIPを攻撃者として記録
+echo "Record the attacking IP as an attacker"
 iptables -N TRACK_ATTACKER 2>/dev/null
 iptables -N ANTI_ATTACKER
 iptables -N ANTI_ATTACKER_
@@ -2176,7 +2176,7 @@ iptables -A ANTI_ATTACKER_ -m recent --name attacker-medium --update --rttl --se
 iptables -A ANTI_ATTACKER_ -m recent --name attacker-medium --set
 #iptables -A ANTI_ATTACKER_ -m recent --name attacker-slow --update --rttl --seconds 86400 -j RETURN
 iptables -A ANTI_ATTACKER_ -m recent --name attacker-slow --set
-# INVALIDpacket NG
+echo "INVALIDpacket NG"
 iptables -N FW_INVALID 2>/dev/null
 iptables -N DENY_INVALID
 iptables -N DENY_INVALID_
@@ -2186,7 +2186,7 @@ iptables -A FW_INVALID -i w+ -j DENY_INVALID
 iptables -A DENY_INVALID -m state --state INVALID -j DENY_INVALID_
 iptables -A DENY_INVALID_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'INVALIDpacket : '
 iptables -A DENY_INVALID_ -j DROP
-# NetBIOS NG
+echo "NetBIOS NG"
 iptables -N FW_NETBIOS 2>/dev/null
 iptables -N DENY_NETBIOS
 iptables -N DENY_NETBIOS_
@@ -2198,7 +2198,7 @@ iptables -A DENY_NETBIOS -p udp -m multiport --dports 135,137,138,139,445 -j DEN
 iptables -A DENY_NETBIOS_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'NETBIOS NG : '
 iptables -A DENY_NETBIOS_ -j TRACK_ATTACKER
 iptables -A DENY_NETBIOS_ -j DROP
-# Stealth Scan
+echo "Stealth Scan"
 iptables -N STEALTH_SCAN
 iptables -A STEALTH_SCAN -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix "stealth_scan_attack: "
 iptables -A STEALTH_SCAN -j TRACK_ATTACKER
@@ -2218,7 +2218,7 @@ iptables -A INPUT -p tcp --tcp-flags ACK,URG URG     -j STEALTH_SCAN
 
 iptables -A INPUT -f -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'fragment_packet:'
 iptables -A INPUT -f -j DROP
-# Ping of Death
+echo "Ping of Death"
 iptables -N FW_PINGDEATH 2>/dev/null
 iptables -N ANTI_PINGDEATH
 iptables -N ANTI_PINGDEATH_
@@ -2237,7 +2237,7 @@ iptables -A ANTI_PINGDEATH_ \
 iptables -A ANTI_PINGDEATH_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'Ping_of_Death : '
 iptables -A ANTI_PINGDEATH_ -j TRACK_ATTACKER
 iptables -A ANTI_PINGDEATH_ -j DROP
-# ※IP spoofing攻撃対策
+echo "IP spoofing attack countermeasures"
 iptables -N FW_SPOOFING 2>/dev/null
 iptables -N ANTI_SPOOFING
 iptables -N ANTI_SPOOFING_
@@ -2253,8 +2253,8 @@ iptables -A ANTI_SPOOFING_ -s 192.168.0.0/16 -j ANTI_SPOOFING__
 iptables -A ANTI_SPOOFING__ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'IP_spoofing : '
 iptables -A ANTI_SPOOFING__ -j TRACK_ATTACKER
 iptables -A ANTI_SPOOFING__ -j DROP
-# DDoS Attack
-# HTTP
+echo "DDoS Attack"
+echo "HTTP"
 iptables -N FW_SYNFLOOD 2>/dev/null
 iptables -N ANTI_SYNFLOOD
 iptables -N ANTI_SYNFLOOD_
@@ -2272,7 +2272,7 @@ iptables -A ANTI_SYNFLOOD_ \
           -j RETURN
 iptables -A ANTI_SYNFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-prefix 'DDoS Attack(HTTP) : '
 iptables -A ANTI_SYNFLOOD_ -j DROP
-# HTTPS
+echo "HTTPS"
 iptables -N FW_SYNFLOOD_SSL 2>/dev/null
 iptables -N ANTI_SYNFLOOD_SSL
 iptables -N ANTI_SYNFLOOD_SSL_
@@ -2290,7 +2290,7 @@ iptables -A ANTI_SYNFLOOD_SSL_ \
           -j RETURN
 iptables -A ANTI_SYNFLOOD_SSL_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-prefix 'DDoS Attack(HTTPS) : '
 iptables -A ANTI_SYNFLOOD_SSL_ -j DROP
-# UDP
+echo "UDP"
 iptables -N FW_UDPFLOOD 2>/dev/null
 iptables -N ANTI_UDPFLOOD
 iptables -N ANTI_UDPFLOOD_
@@ -2308,7 +2308,7 @@ iptables -A ANTI_UDPFLOOD_ \
           -j RETURN
 iptables -A ANTI_UDPFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-prefix 'DDoS Attack(UDP) : '
 iptables -A ANTI_UDPFLOOD_ -j DROP
-# ICMP
+echo "ICMP"
 iptables -N FW_ICMPFLOOD 2>/dev/null
 iptables -N ANTI_ICMPFLOOD
 iptables -N ANTI_ICMPFLOOD_
@@ -2326,19 +2326,19 @@ iptables -A ANTI_ICMPFLOOD_ \
           -j RETURN
 iptables -A ANTI_ICMPFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-prefix 'DDoS Attack(ICMP) : '
 iptables -A ANTI_ICMPFLOOD_ -j DROP
-# IDENT port probe
+echo "IDENT port probe"
 iptables -A INPUT -p tcp -m multiport --dports $IDENT -j REJECT --reject-with tcp-reset
-# ブロードキャストアドレス、マルチキャストアドレス宛パケットは破棄
+echo "Packets addressed to broadcast address and multicast address are discarded"
 iptables -A INPUT -d 192.168.1.255   -j DROP
 iptables -A INPUT -d 255.255.255.255 -j DROP
 iptables -A INPUT -d 224.0.0.1       -j DROP
 ###########################################################
-#対策　end
+echo "Measures end"
 ###########################################################
 ###########################################################
-# IP許可
+echo "IP permit"
 ###########################################################
-#GROBAL IP許可
+echo "GLOBAL IP permission"
 if [ "${ALLOW_ROUGHLY_HOSTS}" ]
 then
 	for allow_grohost in ${ALLOW_ROUGHLY_HOSTS[@]}
@@ -2346,7 +2346,7 @@ then
 		iptables -A INPUT -p tcp -s $allow_grohost -m multiport --dports $ALLOW_GLOBAL_PORT -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 	done
 fi
-#SSH IP許可
+echo "SSH IP permission"
 if [ "${ALLOW_SSH_HOSTS}" ]
 then
 	for allow_sshhost in ${ALLOW_SSH_HOSTS[@]}
@@ -2355,12 +2355,12 @@ then
 	done
 fi
 ###########################################################
-# throughput 
+echo "throughput"
 ###########################################################
-#ポート443の通信のTOSを高スループットのものへ書き換え
+echo "Rewrite TOS of communication on port 443 to high throughput"
 iptables -t mangle -A PREROUTING -p tcp --dport 443 -j TOS --set-tos Maximize-Throughput
 ###########################################################
-# finailize
+echo "finailize"
 ###########################################################
 iptables -A INPUT  -j LOG --log-prefix "drop: "
 iptables -A INPUT  -j DROP

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # パス
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 ###########################################################
@@ -2048,7 +2047,6 @@ LOG_LIMIT_BURST=1000
 # ポート定義
 SSH=`cat /etc/ssh/sshd_config | grep '^#\?Port ' | tail -n 1 | sed -e 's/^[^0-9]*\([0-9]\+\).*$/\1/'`
 IDENT=113
-
 initialize() 
 {
 	iptables -F # テーブル初期化
@@ -2088,18 +2086,15 @@ finailize()
 	return 0
 	return 1
 }
-
 ###########################################################
 # initialize
 ###########################################################
 initialize
 PolicyDecision
-
 ###########################################################
 # 信頼ホスト許可
 ###########################################################
 iptables -A INPUT -i lo -j ACCEPT # SELF -> SELF
-
 #PRIVATE IP許可
 if [ "${ALLOW_LOCAL_HOSTS}" ]
 then
@@ -2108,17 +2103,13 @@ then
 		iptables -A INPUT -p tcp -s $allow_prihost -m multiport --dports $ALLOW_LOCAL_PORT -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 	done
 fi
-
-
 ###########################################################
 # セッション確立後のパケット疎通は許可
 ###########################################################
 iptables -A INPUT  -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
-
 ###########################################################
 #対策 start
 ###########################################################
-
 # 送信元IPの偽装防止
 sed -i '/net.ipv4.conf.*.rp_filter/d' /etc/sysctl.conf
 for dev in `ls /proc/sys/net/ipv4/conf/`
@@ -2126,7 +2117,6 @@ do
     sysctl -w net.ipv4.conf.$dev.rp_filter=1 > /dev/null
     echo "net.ipv4.conf.$dev.rp_filter=1" >> /etc/sysctl.conf
 done
-
 # ICMP Redirectパケットを拒否
 sed -i '/net.ipv4.conf.*.accept_redirects/d' /etc/sysctl.conf
 for dev in `ls /proc/sys/net/ipv4/conf/`
@@ -2134,7 +2124,6 @@ do
     sysctl -w net.ipv4.conf.$dev.accept_redirects=0 > /dev/null
     echo "net.ipv4.conf.$dev.accept_redirects=0" >> /etc/sysctl.conf
 done
-
 # Source Routedパケットを拒否
 sed -i '/net.ipv4.conf.*.accept_source_route/d' /etc/sysctl.conf
 for dev in `ls /proc/sys/net/ipv4/conf/`
@@ -2142,25 +2131,21 @@ do
     sysctl -w net.ipv4.conf.$dev.accept_source_route=0 > /dev/null
     echo "net.ipv4.conf.$dev.accept_source_route=0" >> /etc/sysctl.conf
 done
-
 # ブロードキャストアドレス宛pingには応答しない
 # ※Smurf攻撃対策
 sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=1 > /dev/null
 sed -i '/net.ipv4.icmp_echo_ignore_broadcasts/d' /etc/sysctl.conf
 echo "net.ipv4.icmp_echo_ignore_broadcasts=1" >> /etc/sysctl.conf
-
 # SYN Cookiesを有効にする
 # ※TCP SYN Flood攻撃対策
 sysctl -w net.ipv4.tcp_syncookies=1 > /dev/null
 sed -i '/net.ipv4.tcp_syncookies/d' /etc/sysctl.conf
 echo "net.ipv4.tcp_syncookies=1" >> /etc/sysctl.conf
-
 # システムの連続稼働時間を通知しない
 # ※カーネルバージョン特定対策
 sysctl -w net.ipv4.tcp_timestamps=1 > /dev/null
 sed -i '/net.ipv4.tcp_timestamps/d' /etc/sysctl.conf
 echo "net.ipv4.tcp_timestamps=1" >> /etc/sysctl.conf
-
 # 攻撃を行っているIPを攻撃者として記録
 iptables -N TRACK_ATTACKER 2>/dev/null
 iptables -N ANTI_ATTACKER
@@ -2191,7 +2176,6 @@ iptables -A ANTI_ATTACKER_ -m recent --name attacker-medium --update --rttl --se
 iptables -A ANTI_ATTACKER_ -m recent --name attacker-medium --set
 #iptables -A ANTI_ATTACKER_ -m recent --name attacker-slow --update --rttl --seconds 86400 -j RETURN
 iptables -A ANTI_ATTACKER_ -m recent --name attacker-slow --set
-
 # INVALIDpacket NG
 iptables -N FW_INVALID 2>/dev/null
 iptables -N DENY_INVALID
@@ -2202,7 +2186,6 @@ iptables -A FW_INVALID -i w+ -j DENY_INVALID
 iptables -A DENY_INVALID -m state --state INVALID -j DENY_INVALID_
 iptables -A DENY_INVALID_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'INVALIDpacket : '
 iptables -A DENY_INVALID_ -j DROP
-
 # NetBIOS NG
 iptables -N FW_NETBIOS 2>/dev/null
 iptables -N DENY_NETBIOS
@@ -2215,7 +2198,6 @@ iptables -A DENY_NETBIOS -p udp -m multiport --dports 135,137,138,139,445 -j DEN
 iptables -A DENY_NETBIOS_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'NETBIOS NG : '
 iptables -A DENY_NETBIOS_ -j TRACK_ATTACKER
 iptables -A DENY_NETBIOS_ -j DROP
-
 # Stealth Scan
 iptables -N STEALTH_SCAN
 iptables -A STEALTH_SCAN -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix "stealth_scan_attack: "
@@ -2236,7 +2218,6 @@ iptables -A INPUT -p tcp --tcp-flags ACK,URG URG     -j STEALTH_SCAN
 
 iptables -A INPUT -f -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'fragment_packet:'
 iptables -A INPUT -f -j DROP
-
 # Ping of Death
 iptables -N FW_PINGDEATH 2>/dev/null
 iptables -N ANTI_PINGDEATH
@@ -2256,7 +2237,6 @@ iptables -A ANTI_PINGDEATH_ \
 iptables -A ANTI_PINGDEATH_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'Ping_of_Death : '
 iptables -A ANTI_PINGDEATH_ -j TRACK_ATTACKER
 iptables -A ANTI_PINGDEATH_ -j DROP
-
 # ※IP spoofing攻撃対策
 iptables -N FW_SPOOFING 2>/dev/null
 iptables -N ANTI_SPOOFING
@@ -2273,7 +2253,6 @@ iptables -A ANTI_SPOOFING_ -s 192.168.0.0/16 -j ANTI_SPOOFING__
 iptables -A ANTI_SPOOFING__ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-level debug --log-prefix 'IP_spoofing : '
 iptables -A ANTI_SPOOFING__ -j TRACK_ATTACKER
 iptables -A ANTI_SPOOFING__ -j DROP
-
 # DDoS Attack
 # HTTP
 iptables -N FW_SYNFLOOD 2>/dev/null
@@ -2293,7 +2272,6 @@ iptables -A ANTI_SYNFLOOD_ \
           -j RETURN
 iptables -A ANTI_SYNFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-prefix 'DDoS Attack(HTTP) : '
 iptables -A ANTI_SYNFLOOD_ -j DROP
-
 # HTTPS
 iptables -N FW_SYNFLOOD_SSL 2>/dev/null
 iptables -N ANTI_SYNFLOOD_SSL
@@ -2312,7 +2290,6 @@ iptables -A ANTI_SYNFLOOD_SSL_ \
           -j RETURN
 iptables -A ANTI_SYNFLOOD_SSL_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-prefix 'DDoS Attack(HTTPS) : '
 iptables -A ANTI_SYNFLOOD_SSL_ -j DROP
-
 # UDP
 iptables -N FW_UDPFLOOD 2>/dev/null
 iptables -N ANTI_UDPFLOOD
@@ -2331,7 +2308,6 @@ iptables -A ANTI_UDPFLOOD_ \
           -j RETURN
 iptables -A ANTI_UDPFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-prefix 'DDoS Attack(UDP) : '
 iptables -A ANTI_UDPFLOOD_ -j DROP
-
 # ICMP
 iptables -N FW_ICMPFLOOD 2>/dev/null
 iptables -N ANTI_ICMPFLOOD
@@ -2350,10 +2326,8 @@ iptables -A ANTI_ICMPFLOOD_ \
           -j RETURN
 iptables -A ANTI_ICMPFLOOD_ -m limit --limit $LOG_LIMIT --limit-burst $LOG_LIMIT_BURST -j LOG --log-prefix 'DDoS Attack(ICMP) : '
 iptables -A ANTI_ICMPFLOOD_ -j DROP
-
 # IDENT port probe
 iptables -A INPUT -p tcp -m multiport --dports $IDENT -j REJECT --reject-with tcp-reset
-
 # ブロードキャストアドレス、マルチキャストアドレス宛パケットは破棄
 iptables -A INPUT -d 192.168.1.255   -j DROP
 iptables -A INPUT -d 255.255.255.255 -j DROP
@@ -2361,7 +2335,6 @@ iptables -A INPUT -d 224.0.0.1       -j DROP
 ###########################################################
 #対策　end
 ###########################################################
-
 ###########################################################
 # IP許可
 ###########################################################
@@ -2381,13 +2354,16 @@ then
 		iptables -A INPUT -p tcp -s $allow_sshhost -m multiport --dports $SSH -j ACCEPT # LIMITED_LOCAL_NET -> SELF
 	done
 fi
-
+###########################################################
+# throughput 
+###########################################################
+#ポート443の通信のTOSを高スループットのものへ書き換え
+iptables -t mangle -A PREROUTING -p tcp --dport 443 -j TOS --set-tos Maximize-Throughput
 ###########################################################
 # finailize
 ###########################################################
 iptables -A INPUT  -j LOG --log-prefix "drop: "
 iptables -A INPUT  -j DROP
-
 trap 'finailize && exit 0' 2 || trap 'finailizeB && exit 0' 2 # Ctrl-C をトラップする
 echo "If there is no problem then press Ctrl-C to finish."
 sleep 30

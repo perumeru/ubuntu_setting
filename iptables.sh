@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#start#   sudo bash iptables.sh
+#end#     sudo iptables-save -c
+
 # パス
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 ###########################################################

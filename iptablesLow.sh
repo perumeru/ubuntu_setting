@@ -4,11 +4,10 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 
 ALLOW_LOCAL_HOSTS=(
-"192.168.0.0/24"
-"192.168.57.0/22"
+(自宅のip)
 )
 ALLOW_SSH_HOSTS=(
-"192.168.57.0/22"
+(自分のデバイスのip)
 )
 ALLOW_ALWAY=(
 	"91.189.88.0/19"
@@ -24,7 +23,7 @@ LOG_LIMIT=45/m
 LOG_LIMIT_BURST=512
 # ポート定義
 SSH=`cat /etc/ssh/sshd_config | grep '^#\?Port ' | tail -n 1 | sed -e 's/^[^0-9]*\([0-9]\+\).*$/\1/'`
-ALLOW_LOCAL_PORT="20,21,53,80,443,990,1344,2222"
+ALLOW_LOCAL_PORT="20,21,53,80,443,990,1344"
 ALLOW_GLOBAL_PORT="2222"
 ##
 readonly UBUNTU=true
@@ -308,15 +307,15 @@ echo "IP permit"
 #		echo -en " allow:$allow_grohost \r"
 #	done
 #fi
-#echo "SSH IP permission"
-#if [ "${ALLOW_SSH_HOSTS}" ]
-#then
-#	for allow_sshhost in ${ALLOW_SSH_HOSTS[@]}
-#	do
-#		iptables -A INPUT -p tcp -s $allow_sshhost -m multiport --dports $SSH -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT # LIMITED_LOCAL_NET -> SELF
-#		echo -en " allow:$allow_sshhost \r"
-#	done
-#fi
+echo "SSH IP permission"
+if [ "${ALLOW_SSH_HOSTS}" ]
+then
+	for allow_sshhost in ${ALLOW_SSH_HOSTS[@]}
+	do
+		iptables -A INPUT -p tcp -s $allow_sshhost -m multiport --dports $SSH -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT # LIMITED_LOCAL_NET -> SELF
+		echo -en " allow:$allow_sshhost \r"
+	done
+fi
 ###########################################################
 echo "throughput"
 ###########################################################

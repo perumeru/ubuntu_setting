@@ -12,8 +12,8 @@
 
 Include /etc/ssh/sshd_config.d/*.conf
 
-Port 20
-AddressFamily any
+Port 2222
+#AddressFamily any
 #ListenAddress 0.0.0.0
 #ListenAddress ::
 
@@ -30,16 +30,17 @@ AddressFamily any
 
 # Authentication:
 
-#LoginGraceTime 2m
+LoginGraceTime 15
 PermitRootLogin no
-#StrictModes yes
-#MaxAuthTries 6
-#MaxSessions 10
+StrictModes yes
+MaxAuthTries 2
+MaxSessions 1
 
-#PubkeyAuthentication yes
+RSAAuthentication yes
+PubkeyAuthentication yes
 
 # Expect .ssh/authorized_keys2 to be disregarded by default in future.
-#AuthorizedKeysFile     .ssh/authorized_keys .ssh/authorized_keys2
+AuthorizedKeysFile      .ssh/authorized_keys .ssh/authorized_keys2 .ssh/id_rsa.pub
 
 #AuthorizedPrincipalsFile none
 
@@ -55,6 +56,7 @@ PermitRootLogin no
 #IgnoreRhosts yes
 
 # To disable tunneled clear text passwords, change to no here!
+#####PasswordAuthentication no
 PasswordAuthentication yes
 PermitEmptyPasswords no
 
@@ -83,6 +85,7 @@ ChallengeResponseAuthentication no
 # If you just want the PAM account and session checks to run without
 # PAM authentication, then enable this but set PasswordAuthentication
 # and ChallengeResponseAuthentication to 'no'.
+#####UsePAM no
 UsePAM yes
 
 #AllowAgentForwarding yes
@@ -98,7 +101,7 @@ PrintMotd no
 #PermitUserEnvironment no
 #Compression delayed
 #ClientAliveInterval 0
-#ClientAliveCountMax 3
+ClientAliveCountMax 2
 #UseDNS no
 #PidFile /var/run/sshd.pid
 #MaxStartups 10:30:100

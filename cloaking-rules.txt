@@ -23,8 +23,6 @@ www.youtube-nocookie.com restrictmoderate.youtube.com
 # Multiple IP entries for the same name are supported.
 # In the following example, the same name maps both to IPv4 and IPv6 addresses:
 
-manifest.googlevideo.com  172.217.1.14
-
 #localhost                127.0.0.1
 #localhost                ::1
 

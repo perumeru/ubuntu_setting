@@ -28,9 +28,7 @@
 ||google.com/pagead/lvz?$domain=youtube.com
 youtube.com,youtube-nocookie.com#$#json-prune 'playerResponse.adPlacements playerResponse.playerAds adPlacements playerAds'$domain=youtube.com
 youtube.com,youtube-nocookie.com#$#override-property-read playerResponse.adPlacements undefined; override-property-read ytInitialPlayerResponse.adPlacements undefined$domain=youtube.com
-youtube.com,youtube-nocookie.com##+js(json-prune, [].playerResponse.adPlacements [].playerResponse.playerAds playerResponse.adPlacements playerResponse.playerAds adPlacements playerAds)$domain=youtube.com
-youtube.com,youtube-nocookie.com##+js(set, playerResponse.adPlacements undefined)$domain=youtube.com
-youtube.com,youtube-nocookie.com##+js(set, ytInitialPlayerResponse.adPlacements, undefined)$domain=youtube.com
+youtube.com##ytd-promoted-sparkles-web-renderer
 ||a.disquscdn.com^
 ||aa.google.com^
 ||ad.doubleclick.net^

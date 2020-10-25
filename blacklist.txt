@@ -1,3 +1,4 @@
+*.000webhostapp.com
 *.click
 *.findmedia.biz
 *.g.doubleclick.com
@@ -9,7 +10,6 @@
 *.uadexchange.com
 *.watch-video.net
 *.xsph.ru
-*.000webhostapp.com
 0001.2waky.com
 000lk3v.wcomhost.com
 000lkub.rcomhost.com
@@ -8719,7 +8719,6 @@ check-now.online
 check-out-this.site
 check-privacy-log.cf
 check-updates.net
-check.ddos-guard.net
 check.toys
 check2bill.org
 checkabil.com
@@ -11553,7 +11552,6 @@ ddmax20.xyz
 ddneh.cf
 ddomb.com
 ddomm.com
-ddos-guard.net
 ddos.93se.com
 ddskyuu.com
 ddtorun.pl
@@ -29729,7 +29727,6 @@ playme.it
 playonlinux.com
 playpanda.net
 playpilot.com
-playstation.com
 playstationgame.tk
 playstream.media
 playtem.com
@@ -34788,7 +34785,6 @@ skyligh.co
 skylite.com.sa
 skylog.kz
 skymedia.co.uk
-skype.com
 skypedong.com
 skypeforbusiness.com
 skypromotion.ru
@@ -42657,7 +42653,6 @@ xaxoro.com
 xbaulknerte.club
 xbgoulaxoen.com
 xbmyvkkksjlsek.com
-xbox.com
 xboxforum.pl
 xbtw.com
 xc.macd.cn

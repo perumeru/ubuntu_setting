@@ -44,21 +44,54 @@ namespace urlCheck
 
                             }
                         }
-                        var sorted = vs.OrderBy(e => e[cnt]).ToArray();
 
-                        sw.Write('\n' + "■■■■■■■■■■ここから対象のurl■■■■■■■■■■");
+                        Console.WriteLine("勝手に*付ける? Y:1 N:0");
+
+                        cstr = Console.ReadLine();
                         StringBuilder stringBuilder = new StringBuilder();
-                        foreach (string[] args in sorted)
+                        if (cstr == "0")
                         {
-                            foreach (var e in args)
+                            sw.Write('\n' + "■■■■■■■■■■ここから対象のurl■■■■■■■■■■");
+                            string[][] sorted = vs.OrderBy(e => e[cnt]).ToArray();
+                            foreach (string[] args in sorted)
                             {
-                                stringBuilder.Append(e + '.');
+                                foreach (string e in args)
+                                {
+                                    stringBuilder.Append(e + '.');
+                                }
+                                string wrt = stringBuilder.Remove(stringBuilder.Length - 1, 1).ToString();
+                                sw.Write('\n' + wrt);
+                                stringBuilder.Clear();
                             }
-                            string wrt = stringBuilder.Remove(stringBuilder.Length - 1, 1).ToString();
-                            sw.Write('\n' + wrt);
-
-
-                            stringBuilder.Clear();
+                        }
+                        else
+                        {
+                            StringBuilder stringBuilder2 = new StringBuilder();
+                            foreach (string[] args in vs)
+                            {
+                                stringBuilder.Append("*.");
+                                for (int i = cnt; i < args.Length; i++)
+                                {
+                                    stringBuilder.Append(args[i] + '.');
+                                }
+                                string wrt = stringBuilder.Remove(stringBuilder.Length - 1, 1).ToString();
+                                sw.Write('\n' + wrt);
+                                stringBuilder.Clear();
+                            }
+                        }
+                    }
+                    Console.WriteLine("重複消しとく? Y:1 N:0");
+                    cstr = Console.ReadLine();
+                    if (cstr != "0")
+                    {
+                        stringbuf = File.ReadAllLines(@"rs\blacklist.txt").Distinct().OrderBy(x => x).ToArray();
+                        using (StreamWriter sw = new StreamWriter(@"rs\blacklist.txt"))
+                        {
+                            bool one = false;
+                            foreach (string args in stringbuf)
+                            {
+                                if (one) sw.Write('\n' + args); else { sw.Write(args); one = true; }
+                            }
                         }
                     }
                 }

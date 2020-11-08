@@ -496,7 +496,6 @@ api.sec.miui.com
 api.soundcloud.com
 api.splunk.com
 api.staging.scp.splunk.com
-api.taboola.com
 api.target.com
 api.tau.vk.com
 api.tradedoubler.com
@@ -706,7 +705,6 @@ bcee.lu
 bcorg.web.burst-alliance.org
 be.2.cqcounter.com
 be.cqcounter.com
-beap.gemini.yahoo.com
 beatsbydre.com
 bebe.ugc.bazaarvoice.com
 bedbathandbeyond.com
@@ -1077,7 +1075,6 @@ cleanandclear.ugc.bazaarvoice.com
 cleanclearca.ugc.bazaarvoice.com
 cleanprint.net
 cleveland.com
-click.linksynergy.com
 click.simba.taobao.com
 click.trafficguard.ai
 click.virt.exacttarget.com
@@ -2139,7 +2136,6 @@ golfnow.ugc.bazaarvoice.com
 goo.gl
 goodyear.ugc.bazaarvoice.com
 googl.com
-google
 google-analytics.com
 google.ad
 google.ae

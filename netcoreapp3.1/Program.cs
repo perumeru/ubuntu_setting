@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 
 namespace urlCheck
 {
@@ -12,12 +14,57 @@ namespace urlCheck
         static int Main(string[] argss)
         {
             Console.WriteLine("◆◆◆◆◆◆◆◆◆◆◆◆Blacklist最適化ツール◆◆◆◆◆◆◆◆◆◆◆◆◆");
-            Console.WriteLine("◆「0」whitelist.txtのurlをblacklist.txtから省き、昇順ソートします。 ◆");
-            Console.WriteLine("◆「1」dnsで解決不可のurlを省きます。                                ◆");
-            Console.WriteLine("◆「2」何もしません。                                                ◆");
+            Console.WriteLine("◆「0」blacklist.txtを指定した.番目で昇順ソートします。              ◆");
+            Console.WriteLine("◆「1」whitelist.txtのurlをblacklist.txtから省き、昇順ソートします。 ◆");
+            Console.WriteLine("◆「2」dnsで解決不可のurlを省きます。                                ◆");
+            Console.WriteLine("◆「3」何もしません。                                                ◆");
             Console.WriteLine("◆ ◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆");
             string cstr = Console.ReadLine();
             if (cstr == "0")
+            {
+                Console.WriteLine("何個目の.で並び替える?その番目に.がない場合ははじきます:");
+                int cnt = int.Parse(Console.ReadLine());
+                string[] stringbuf = File.ReadAllLines(@"blacklist.txt");
+                List<string[]> vs = new List<string[]>();
+                try
+                {
+                    using (StreamWriter sw = new StreamWriter(@"rs\blacklist.txt"))
+                    {
+                        sw.Write("■■■■■■■■■■ここから省かれたurl■■■■■■■■■■");
+                        foreach (string args in stringbuf)
+                        {
+                            string[] buff = args.Split('.');
+                            if (buff.Length > cnt)
+                            {
+                                vs.Add(buff);
+                            }
+                            else
+                            {
+                                sw.Write('\n' + args);
+
+                            }
+                        }
+                        var sorted = vs.OrderBy(e => e[cnt]).ToArray();
+
+                        sw.Write('\n' + "■■■■■■■■■■ここから対象のurl■■■■■■■■■■");
+                        StringBuilder stringBuilder = new StringBuilder();
+                        foreach (string[] args in sorted)
+                        {
+                            foreach (var e in args)
+                            {
+                                stringBuilder.Append(e + '.');
+                            }
+                            string wrt = stringBuilder.Remove(stringBuilder.Length - 1, 1).ToString();
+                            sw.Write('\n' + wrt);
+
+
+                            stringBuilder.Clear();
+                        }
+                    }
+                }
+                catch (System.Exception fe) { Console.WriteLine(fe.Message); }
+            }
+            else if (cstr == "1")
             {
                 try
                 {
@@ -48,7 +95,7 @@ namespace urlCheck
                 }
                 catch (System.Exception fe) { Console.WriteLine(fe.Message); }
             }
-            else if (cstr == "1")
+            else if (cstr == "2")
             {
                 Console.WriteLine("update1-");
                 StreamReader sr;

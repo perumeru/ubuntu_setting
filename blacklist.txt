@@ -9,14 +9,6 @@
 02b5da94a2bd4aea.com
 039ad0897e6da.com
 04426f8b7ce9b069431.com
-banesnorttat.cam
-c.disquscdn.com
-iconcnd.net
-ocsp.sectigo.com
-pipfieton.site
-realmpallduns.com
-s.amazon-adsystem.com
-zap.buzz
 04stream.com
 050y9lhe8p.com
 059e025e7484.com
@@ -742,13 +734,8 @@ aarki.com
 aas-nv-a.aaxads.com
 aas.dc-1.net
 aaucwbe.com
-aax-eu-dub.amazon.com
-accounts62-amazon.com
-assoc-amazon.com
-client-log.amazon.com
-jpawamazon.com
-www.jpawamazon.com
 aax-cpm.amazon-adsystem.com
+aax-eu-dub.amazon.com
 aax-eu-rtb-adx.amazon-adsystem.com
 aax-eu-rtb.amazon-adsystem.com
 aax-fe-pek.amazon-adsystem.com
@@ -870,6 +857,7 @@ accounts.doubleclick.net
 accounts.growingio.com
 accounts.novaonx.com
 accounts.pkr.com
+accounts62-amazon.com
 accreditor.club
 acdcdn.com
 acdn.adnxs.com
@@ -4832,6 +4820,7 @@ ban-host.ru
 bananaflippy.com
 bandelcot.com
 banerator.net
+banesnorttat.cam
 bangedmarketcake.com
 bango.net
 banhtv.org
@@ -5849,6 +5838,7 @@ c.cnzz.com
 c.cokhach.com
 c.d.eclick.vn
 c.deployads.com
+c.disquscdn.com
 c.doublemax.net
 c.eclick.vn
 c.effectivemeasure.net
@@ -7091,6 +7081,7 @@ clickz.com
 clicmanager.fr
 client-analytics.braintreegateway.com
 client-event-reporter.twitch.tv
+client-log.amazon.com
 client-pages.adnetwork.vn
 client-uat.addthiscdn.com
 client.addthiscdn.com
@@ -12638,6 +12629,7 @@ icon.chartboost.com
 icon.cnzz.com
 icon2count.com
 iconadserver.com
+iconcnd.net
 iconstadper.com
 icptrack.com
 id-cdn.effectivemeasure.net
@@ -13621,6 +13613,7 @@ jp.linkshare.com
 jp.marketo.com
 jp.marketolive.com
 jp.tags.mediaforge.com
+jpawamazon.com
 jpdjbrpb.com
 jpush.io
 jqfjrjka5t.top
@@ -16913,6 +16906,7 @@ ocp.cbsinteractive.com
 ocsext.exponential.com
 ocsext1.exponential.com
 ocsp.msocsp.comcdn.bttrack.com
+ocsp.sectigo.com
 oct-pass.net
 octophor.com
 octopuspop.com
@@ -18038,6 +18032,7 @@ pipeaota.com
 pipedream.wistia.com
 pipelinedb.sp.backtrace.io
 pipeteesundid.com
+pipfieton.site
 pipgiglea.club
 pipmag.advertserve.com
 pippio.com
@@ -19622,6 +19617,7 @@ realitycash.com
 realitytraffic.com
 realmatch.com
 realmedia-a800.d4p.net
+realmpallduns.com
 realpush.media
 realsecuredredirect.com
 realssp.co.kr
@@ -20539,6 +20535,7 @@ s.adroll.com
 s.ads.152media.com
 s.adtelligent.com
 s.agentanalytics.com
+s.amazon-adsystem.com
 s.atemda.com
 s.axonix.com
 s.baomoi.xdn.vn
@@ -21482,6 +21479,8 @@ simsite.outbrain.com
 simvinvo.com
 sin.creativecdn.com
 sin.fb.adsrvr.org
+sin3-ib.adnxs.com
+sin3-ib.sin1.geoadnxs.com
 sincerebuffalo.com
 sincerelypractically.com
 sincerespy.com
@@ -26350,6 +26349,7 @@ www.iperceptions.com
 www.islandmob.com
 www.izooto.com
 www.jads.co
+www.jpawamazon.com
 www.jpush.cn
 www.jpush.io
 www.jscount.com
